@@ -299,7 +299,7 @@ def find_ak_ext_ana_neighbors(input_forcings, config_options, d_current, mpi_con
     current_ext_ana_cycle = config_options.current_fcst_cycle - datetime.timedelta(
         seconds=(ana_offset + input_forcings.userCycleOffset) * 60.0)
     
-    ext_ana_horizon = 32
+    ext_ana_horizon = 9999
 
     # If the user has specified a forcing horizon that is greater than what is available
     # for this time period, throw an error.
@@ -342,14 +342,16 @@ def find_ak_ext_ana_neighbors(input_forcings, config_options, d_current, mpi_con
         prev_ext_ana_forecast_hour = 1
 
     # Calculate expected file paths.
-    tmp_file1 = input_forcings.inDir + '/' + prev_ext_ana_date.strftime('%Y%m%d%H') + \
+    tmp_file1 = input_forcings.inDir + '/' + current_ext_ana_cycle.strftime('%Y%m%d%H') + \
                 "/" + prev_ext_ana_date.strftime('%Y%m%d%H') +  "00" + \
                 ".LDASIN_DOMAIN1"
     if mpi_config.rank == 0:
         config_options.statusMsg = "Previous ExtAnA file being used: " + tmp_file1
         err_handler.log_msg(config_options, mpi_config)
 
-    tmp_file2 = tmp_file1
+    tmp_file2 = input_forcings.inDir + '/' + current_ext_ana_cycle.strftime('%Y%m%d%H') + \
+                "/" + next_ext_ana_date.strftime('%Y%m%d%H') +  "00" + \
+                ".LDASIN_DOMAIN1"
     if mpi_config.rank == 0:
         if mpi_config.rank == 0:
             config_options.statusMsg = "Next ExtAnA file being used: " + tmp_file2
