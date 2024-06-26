@@ -90,6 +90,7 @@ class ConfigOptions:
         self.precipBiasCorrectOpt = None
         self.runCfsNldasBiasCorrect = False
         self.cfsv2EnsMember = None
+        self.nbmqmdEnsNumber = None
         self.customFcstFreq = None
         self.rqiMethod = None
         self.rqiThresh = 1.0
@@ -127,8 +128,8 @@ class ConfigOptions:
 
         # Check to make sure forcing options make sense
         for forceOpt in self.input_forcings:
-            if forceOpt < 0 or forceOpt > 21:
-                err_handler.err_out_screen('Please specify InputForcings values between 1 and 21.')
+            if forceOpt < 0 or forceOpt > 22:
+                err_handler.err_out_screen('Please specify InputForcings values between 1 and 22.')
             # Keep tabs on how many custom input forcings we have.
             if forceOpt == 10:
                 self.number_custom_inputs = self.number_custom_inputs + 1
@@ -1269,6 +1270,22 @@ class ConfigOptions:
                     err_handler.err_out_screen('Improper cfsEnsNumber options specified in the configuration file')
                 if self.cfsv2EnsMember < 1 or self.cfsv2EnsMember > 4:
                     err_handler.err_out_screen('Please chose an cfsEnsNumber value of 1,2,3 or 4.')
+
+        # Read in NBM-QMD ensemble member information IF we have chosen NBM-QMD as an input forcing (input_forcings=22).
+        for optTmp in self.input_forcings:
+            if optTmp == 22: 
+                try:
+                    self.nbmqmdEnsNumber = json.loads(config['Ensembles']['nbmqmdEnsNumber'])
+                except KeyError:
+                    err_handler.err_out_screen('Unable to locate nbmqmdEnsNumber under the Ensembles '
+                                               'section of the configuration file')
+                except configparser.NoOptionError:
+                    err_handler.err_out_screen('Unable to locate nbmqmdEnsNumber under the Ensembles '
+                                               'section of the configuration file')
+                except json.JSONDecodeError:
+                    err_handler.err_out_screen('Improper nbmqmdEnsNumber options specified in the configuration file')
+                if self.nbmqmdEnsNumber < 1 or self.nbmqmdEnsNumber > 6:
+                    err_handler.err_out_screen('Please chose an nbmqmdEnsNumber value in range of [1:6]')
 
         # Read in information for the custom input NetCDF files that are to be processed.
         # Read in the ForecastInputHorizons options.
